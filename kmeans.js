@@ -4,34 +4,56 @@ function countDistance(a, b) {
   var z = a[2] - b[2];
   return x * x + y * y + z * z;
 }
+
 function findNearestCenter(point, centers) {
   var bindex = 0;
   var bdistance = countDistance(point, centers[0]);
+
   for (var i = 1; i < centers.length; i++) {
-    var d = countDistance(point, centers[i]);
-    if (d < bdistance) {
-      bdistance = d;
+    var distance = countDistance(point, centers[i]);
+    if (distance < bdistance) {
+      bdistance = distance;
       bindex = i;
     }
   }
+
   return bindex;
 }
-function kMeans(points, k, maxTimes) {
+function makeRandomCenters(points, k) {
   var centers = [];
-  var labels = [];
-  var olabels = [];
-  for (var i = 0; i < k; i++) {
-    var index = Math.floor(i * points.length / k);
-    centers.push(points[index].slice());
+  var usedIndexes = [];
+  while (centers.length < k) {
+    var index = Math.floor(Math.random() * points.length);
+
+    if (usedIndexes.indexOf(index) === -1) {
+      usedIndexes.push(index);
+      centers.push(points[index].slice());
+    }
   }
+
+  return centers;
+}
+function kMeans(points, k, mt) {
+  if (!points || points.length === 0) {
+    return {
+      centers: [],
+      labels: [],
+      t: 0
+    };
+  }
+  k = Math.max(1, Math.min(k, points.length));
+  mt = mt || 35;
+  var centers = makeRandomCenters(points, k);
+  var labels = [];
+  var olabel = [];
   var rt = 0;
-  for (var t = 0; t < maxTimes; t++) {
+  for (var t = 0; t < mt; t++) {
     rt = t + 1;
     var changed = false;
     for (var p = 0; p < points.length; p++) {
       var group = findNearestCenter(points[p], centers);
       labels[p] = group;
-      if (olabels[p] !== group) {
+      if (olabel[p] !== group) {
         changed = true;
       }
     }
@@ -48,7 +70,6 @@ function kMeans(points, k, maxTimes) {
       sum[label][2] += points[j][2];
       count[label]++;
     }
-
     for (var m = 0; m < k; m++) {
       if (count[m] === 0) {
         centers[m] = points[Math.floor(Math.random() * points.length)].slice();
@@ -60,11 +81,12 @@ function kMeans(points, k, maxTimes) {
         ];
       }
     }
-    olabels = labels.slice();
+    olabel = labels.slice();
     if (!changed && t > 1) {
       break;
     }
   }
+
   return {
     centers: centers,
     labels: labels,

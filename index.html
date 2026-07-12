@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>L'Atelier Chromatique - 调色盘分析器</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="masthead">
+        <p class="eyebrow"><span class="brush-mark" aria-hidden="true">⌁</span> ARTISAN DIGITAL ATELIER · 数字画室</p>
+        <div class="title-row">
+          <h1>L'Atelier Chromatique</h1>
+        </div>
+      </div>
+    </header>
+
+    <section class="analysis-grid">
+      <div class="left-column">
+        <section class="control-desk" aria-label="画室手札与聚类参数控制">
+      <div class="desk-heading">
+        <h2>画室手札 · 配方控制 <span>(ATELIER SETTINGS DESK)</span></h2>
+        <span>K-MEANS PARAMETERS</span>
+      </div>
+      <div class="desk-grid">
+        <div class="desk-group upload-group">
+          <h3>图像输入方式</h3>
+          <label class="upload-zone">
+            <span class="upload-icon" aria-hidden="true">⇧</span>
+            <strong>拖拽或点击上传本地图像</strong>
+            <small>支持 PNG, JPG, WEBP</small>
+            <input id="imageInput" type="file" accept="image/*">
+          </label>
+        </div>
+
+        <div class="desk-group sample-group">
+          <div class="group-title-row">
+            <h3>名作采样预设</h3>
+            <span>经典画盘</span>
+          </div>
+          <div class="sample-presets" id="sampleButtons">
+            <button type="button" data-sample="landscape" data-title="莫奈《睡莲》" data-artist="Claude Monet" class="sample-card is-selected"><strong>莫奈《睡莲》</strong><small>Claude Monet</small></button>
+            <button type="button" data-sample="poster" data-title="梵高《盛开的杏花》" data-artist="Vincent van Gogh" class="sample-card"><strong>梵高《盛开的杏花》</strong><small>Vincent van Gogh</small></button>
+            <button type="button" data-sample="food" data-title="葛饰北斋《神奈川冲浪里》" data-artist="Hokusai Katsushika" class="sample-card"><strong>葛饰北斋《神奈川冲浪里》</strong><small>Hokusai Katsushika</small></button>
+            <button type="button" data-sample="chinese" data-title="传统写意山水" data-artist="东方水墨意象" class="sample-card"><strong>传统写意山水</strong><small>东方水墨意象</small></button>
+          </div>
+        </div>
+
+        <div class="desk-group parameter-group">
+          <div class="parameter-title-row">
+            <h3>色彩复杂度 (K)</h3>
+            <strong class="parameter-value"><span id="kText">6</span> 主色</strong>
+          </div>
+          <input id="kRange" type="range" min="2" max="10" value="6" aria-label="色彩复杂度 K">
+          <div class="parameter-split">
+            <label class="field compact-field">
+              <span>测量空间</span>
+              <select id="spaceSelect">
+                <option value="rgb">RGB</option>
+                <option value="lab" selected>LAB</option>
+              </select>
+            </label>
+            <label class="field compact-field">
+              <span>采样质量</span>
+              <select id="qualitySelect">
+                <option value="5000">快</option>
+                <option value="12000" selected>中</option>
+                <option value="30000">精</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="desk-group compute-group">
+          <button type="button" id="runBtn" class="run-button"><span aria-hidden="true">✧</span> 启动色彩聚类</button>
+          <div class="run-stats">
+            <div><span>采样像素</span><strong id="sampleCount">-</strong></div>
+            <div><span>解构耗时</span><strong id="runTime">-</strong></div>
+          </div>
+        </div>
+      </div>
+        </section>
+
+      <section class="preview-panel paper-panel">
+        <div class="panel-heading">
+          <h2>研习画布</h2>
+          <div class="view-switch" role="group" aria-label="画布预览模式">
+            <button type="button" id="previewOriginalBtn" class="is-active">原画</button>
+            <button type="button" id="previewClusterBtn">抽象图</button>
+          </div>
+        </div>
+        <p id="imageMeta" class="panel-note">等待图片加载</p>
+        <div class="canvas-stage">
+          <figure class="canvas-view is-visible" data-preview="original">
+            <canvas id="sourceCanvas" width="520" height="320"></canvas>
+            <figcaption>ORIGINAL</figcaption>
+          </figure>
+          <figure class="canvas-view" data-preview="cluster">
+            <canvas id="clusterCanvas" width="520" height="320"></canvas>
+            <figcaption>CLUSTERED PALETTE</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      </div>
+
+      <section class="palette-panel paper-panel">
+        <div class="palette-header panel-heading">
+          <h2>色彩基因库</h2>
+          <strong>K = <span id="kTextPalette">6</span></strong>
+        </div>
+        <div class="palette-results">
+          <div class="swatch-column">
+            <div class="color-carousel">
+              <button type="button" id="colorPrev" class="carousel-button" aria-label="上一组色卡">↑</button>
+              <div class="color-viewport">
+                <div id="colorList" class="color-list"></div>
+              </div>
+              <button type="button" id="colorNext" class="carousel-button" aria-label="下一组色卡">↓</button>
+            </div>
+            <div class="color-carousel-meta">
+              <div id="colorAxis" class="color-axis" aria-label="当前主色轴"></div>
+              <span id="colorPager">1 / 1</span>
+            </div>
+          </div>
+          <div class="chart-column">
+            <div class="chart-title-row">
+              <h2>色彩板谱占比</h2>
+              <label class="chart-select-label" aria-label="选择图表样式">
+                <select id="chartSelect">
+                  <option value="pie">饼图</option>
+                  <option value="donut" selected>环形图</option>
+                  <option value="bar">柱状图</option>
+                  <option value="rose">玫瑰图</option>
+                  <option value="treemap">矩形树图</option>
+                </select>
+              </label>
+            </div>
+            <div id="chart" class="chart" role="img" aria-label="颜色聚类像素数量图表"></div>
+        </div>
+      </div>
+      <section class="mean-panel" aria-label="类簇颜色均值分析">
+        <div class="mean-heading">
+          <div>
+            <h3>类簇颜色均值分析</h3>
+            <p>每个类簇的 RGB 均值，数值范围为 0–255</p>
+          </div>
+          <label class="mean-select-label" aria-label="选择颜色均值图表">
+            <span>展示方式</span>
+            <select id="meanChartSelect">
+              <option value="grouped">分组柱状图</option>
+              <option value="radar">雷达图</option>
+            </select>
+          </label>
+        </div>
+        <div id="meanChart" class="mean-chart" role="img" aria-label="各类簇 RGB 平均颜色数值图表"></div>
+      </section>
+      <div class="recipe-export">
+          <div>
+            <h3>导出色彩配方</h3>
+            <p>保留聚类结果，便于后续设计使用。</p>
+          </div>
+          <div class="export-actions">
+            <button type="button" id="exportJsonBtn">▣ JSON 格式</button>
+            <button type="button" id="exportCsvBtn">▤ CSV 格式</button>
+          </div>
+        </div>
+        <div class="ribbon-heading"><span>✧</span> 主色长卷比例条</div>
+        <div id="paletteBar" class="palette-bar" aria-label="聚类颜色比例条"></div>
+      </section>
+    </section>
+
+    <section class="report-panel paper-panel">
+      <div class="report-heading">
+        <div>
+          <h2>画室色彩灵感日志 <em>(Aesthetic Journal)</em></h2>
+        </div>
+        <div class="report-actions">
+          <div class="report-tags"><span>主色: <b id="reportMainColor">-</b></span><span>基调: <b id="reportTone">等待分析</b></span></div>
+          <button type="button" id="aiAnalyzeBtn" class="ai-button">生成 AI 分析</button>
+        </div>
+      </div>
+      <div id="reportBox" class="report-box">聚类完成后会在这里生成颜色报告。</div>
+    </section>
+  </main>
+
+  <canvas id="workCanvas" class="hidden-canvas"></canvas>
+  <script src="sample-assets.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

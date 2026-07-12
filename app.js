@@ -220,11 +220,14 @@ function drawImageToCanvas(img, canvas, useCluster, centers) {
   if (useCluster && centers && centers.length > 0) {
     var imgData = ctx.getImageData(x, y, w, h);
     var data = imgData.data;
+    var centerValues = centers.map(function (center) {
+      return center.value;
+    });
     for (var i = 0; i < data.length; i += 4) {
       if (data[i + 3] < 10) continue;
       var rgb = [data[i], data[i + 1], data[i + 2]];
       var test = lastSpace === "lab" ? rgbToLab(rgb) : rgb;
-      var best = findNearestCenter(test, centers);
+      var best = findNearestCenter(test, centerValues);
       var color = centers[best].rgb;
       data[i] = color[0];
       data[i + 1] = color[1];

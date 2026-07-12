@@ -484,7 +484,8 @@ function renderColorList(result) {
         '<div class="color-info">' +
         '<strong>颜色 ' + (i + 1) + '</strong>' +
         '<p>十六进制：' + result[i].hex.toUpperCase() + "</p>" +
-        '<p>像素数：' + result[i].count.toLocaleString("zh-CN") + " · 占比：" + result[i].percent.toFixed(1) + "%</p>" +
+        '<p>像素数：' + result[i].count.toLocaleString("zh-CN") + "</p>" +
+        '<p class="color-percent">占比：' + result[i].percent.toFixed(1) + "%</p>" +
         '<p>' + type + "</p>" +
         "</div>";
       page.appendChild(item);

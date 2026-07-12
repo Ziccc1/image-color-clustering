@@ -265,7 +265,7 @@ select, input[type="text"], input[type="url"], input[type="password"] {
 .artwork-caption strong { font-family: Georgia, "SimSun", serif; font-size: 15px; }
 .artwork-caption span { margin-top: 2px; color: #8f8a82; font-family: Georgia, serif; font-size: 13px; font-style: italic; }
 
-.palette-panel { padding-bottom: 22px; }
+.palette-panel { padding-bottom: 14px; }
 .palette-header { margin-bottom: 17px; }
 .palette-header h2 { font-size: 21px; }
 .palette-header strong { letter-spacing: .1em; }
@@ -282,6 +282,7 @@ select, input[type="text"], input[type="url"], input[type="password"] {
 .color-info { min-width: 0; }
 .color-info strong { display: block; overflow: hidden; color: #4a4642; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
 .color-info p { margin: 5px 0 0; overflow: hidden; color: #99948e; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.color-info .color-percent { color: #6f675f; font-weight: 700; }
 .color-carousel-meta { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; margin-top: 12px; }
 .color-axis { display: flex; min-height: 6px; overflow: hidden; background: #f0eeeb; border-radius: 99px; }
 .axis-segment { min-width: 7px; height: 6px; opacity: .82; }
@@ -306,16 +307,17 @@ select, input[type="text"], input[type="url"], input[type="password"] {
 .mean-fallback-bar { position: relative; height: 5px; overflow: hidden; background: #eeeae5; border-radius: 99px; }
 .mean-fallback-bar span { display: block; height: 100%; border-radius: inherit; }
 .mean-fallback-bar em { position: absolute; right: 4px; top: -5px; color: #6a635c; font-size: 10px; font-style: normal; }
-.recipe-export { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin-top: 25px; padding: 18px 0 17px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.recipe-export h3 { margin: 0; color: #59544e; font-size: 16px; }
-.recipe-export p { margin: 5px 0 0; color: #a8a39c; font-size: 12px; }
-.export-actions { display: flex; gap: 10px; }
-.export-actions button { min-height: 39px; padding: 0 17px; color: #625d57; background: #fff; border: 1px solid #dedbd6; border-radius: 7px; font-size: 13px; }
+.recipe-export { position: relative; display: flex; justify-content: space-between; gap: 20px; align-items: center; min-height: 43px; margin-top: 14px; padding: 9px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.recipe-export > div:first-child { padding-right: 170px; }
+.recipe-export h3 { margin: 0; color: #59544e; font-size: 14px; }
+.recipe-export p { display: none; }
+.export-actions { position: absolute; top: 50%; right: 0; display: flex; gap: 6px; transform: translateY(-50%); }
+.export-actions button { min-height: 29px; padding: 0 9px; color: #625d57; background: #fff; border: 1px solid #dedbd6; border-radius: 6px; font-size: 11px; }
 .export-actions button:hover { border-color: #9c958d; background: #faf9f7; }
-.ribbon-heading { margin: 23px 0 12px; color: #514d48; font-size: 17px; font-weight: 700; }
+.ribbon-heading { margin: 14px 0 8px; color: #514d48; font-size: 15px; font-weight: 700; }
 .ribbon-heading span { color: #e4a400; }
 .ribbon-heading span:last-child { color: #aaa59f; font-size: 12px; font-weight: 400; letter-spacing: .08em; }
-.palette-bar { display: flex; min-height: 39px; overflow: hidden; border: 1px solid #c9c4bc; border-radius: 9px; box-shadow: inset 0 1px 3px rgba(43, 38, 32, .16); }
+.palette-bar { display: flex; min-height: 34px; overflow: hidden; border: 1px solid #c9c4bc; border-radius: 9px; box-shadow: inset 0 1px 3px rgba(43, 38, 32, .16); }
 .palette-segment { min-width: 22px; display: grid; place-items: center; color: rgba(255, 255, 255, .8); font-size: 11px; font-weight: 700; text-shadow: 0 1px 2px rgba(0, 0, 0, .3); }
 
 .report-panel { margin-top: 38px; padding: 30px 52px 25px; }
@@ -350,6 +352,9 @@ select, input[type="text"], input[type="url"], input[type="password"] {
   .compute-group h3 { margin: 0; }
   .compute-group .run-button { grid-column: 1 / 2; }
   .run-stats { grid-column: 2 / 3; margin: 0; }
+  .color-item { grid-template-columns: 54px minmax(0, 1fr); gap: 8px; padding: 9px; }
+  .swatch { width: 54px; height: 64px; }
+  .color-info p { font-size: 11px; }
 }
 @media (max-width: 1120px) {
   .app-shell { width: min(100% - 36px, 1900px); }
@@ -400,8 +405,9 @@ select, input[type="text"], input[type="url"], input[type="password"] {
   .help-button { width: 44px; height: 44px; }
   .sample-presets, .color-page { grid-template-columns: 1fr; grid-template-rows: repeat(4, minmax(0, 1fr)); }
   .parameter-split { grid-template-columns: 1fr 1fr; }
-  .recipe-export { align-items: flex-start; flex-direction: column; }
-  .export-actions { width: 100%; }
+  .recipe-export { position: static; align-items: flex-start; flex-direction: column; min-height: 0; }
+  .recipe-export > div:first-child { padding-right: 0; }
+  .export-actions { position: static; width: 100%; margin-top: 8px; transform: none; }
   .export-actions button { flex: 1; padding: 0 7px; }
   .chart { height: 280px; }
 }

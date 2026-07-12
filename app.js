@@ -1224,12 +1224,29 @@ async function runAiAnalyze() {
       })
     });
     var data = await res.json();
-    var text = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : "AI 接口返回格式无法识别。";
+    if (!res.ok) {
+      var apiMessage = data.message || data.code || "HTTP " + res.status;
+      if (data.error) {
+        apiMessage = typeof data.error === "string" ? data.error : (data.error.message || data.error.code || apiMessage);
+      }
+      throw new Error(apiMessage);
+    }
+
+    var text = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : "";
+    if (!text && data.output && data.output.text) text = data.output.text;
+    if (Array.isArray(text)) {
+      text = text.map(function (item) {
+        return typeof item === "string" ? item : (item.text || "");
+      }).join("");
+    }
+    if (typeof text !== "string" || !text.trim()) {
+      throw new Error("接口返回中没有可用的分析文本");
+    }
     reportBox.classList.add("is-ai-report");
     reportBox.innerHTML = formatAiReport(text);
   } catch (err) {
     reportBox.classList.remove("is-ai-report");
-    reportBox.innerHTML = "AI 接口调用失败，已保留本地分析。<br>" + makeLocalReport(lastResult, lastPoints.length, lastSpace, Number(kRange.value));
+    reportBox.innerHTML = "AI 接口调用失败：" + escapeHtml(err.message || "未知错误") + "<br>已保留本地分析。<br>" + makeLocalReport(lastResult, lastPoints.length, lastSpace, Number(kRange.value));
   }
   aiAnalyzeBtn.disabled = false;
   aiAnalyzeBtn.textContent = "生成 AI 分析";
